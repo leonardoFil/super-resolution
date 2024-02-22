@@ -1,5 +1,5 @@
 """
-This Python script performs super-resolution on satellite images using two different models: EDSR and WDSR.
+This Python script performs super-resolution on an example satellite image using two different models: EDSR and WDSR.
 It loads pre-trained weights for both models and applies them to a set of input images at different resolutions.
 The resulting super-resolved images are then displayed using matplotlib.
 
