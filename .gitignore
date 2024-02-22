@@ -1,6 +1,7 @@
 .ipynb_checkpoints
 .div2k
 .ckpt
+.custom_data_test
 
 images
 __pycache__
