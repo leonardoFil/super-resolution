@@ -146,6 +146,75 @@ class DIV2K:
         print(f'Cached decoded images in {cache_file}.')
 
 
+
+class CustomDataset:
+    # this class will be used to create a dataset from a folder of images
+    # think of a way of creating the dataset without downloading the images if they are already in the computer. 
+    # Maybe a flag to check if the images are already in the computer, and if they are, just create the dataset.
+    def __init__(self,
+                 images_dir,
+                 downgrade=None,
+                 train_size=0.8,
+                 scale=2):
+        self.images_dir = images_dir
+        self.downgrade = downgrade
+        self.train_size = train_size
+        self.scale = scale
+        
+        if downgrade:
+           #create downgraded images
+            pass
+        else:
+            #create two folders, one for HR and one for LR, and save the images there
+            pass
+
+    def __len__(self):
+        return len(self._hr_image_files()+self._lr_image_files())
+
+    def dataset(self, batch_size=1, repeat_count=None, random_transform=True):
+        ds = tf.data.Dataset.zip((self.lr_dataset(), self.hr_dataset()))
+        # if random_transform:
+        #     ds = ds.map(lambda lr, hr: random_crop(lr, hr, scale=self.scale), num_parallel_calls=AUTOTUNE)
+        #     ds = ds.map(random_rotate, num_parallel_calls=AUTOTUNE)
+        #     ds = ds.map(random_flip, num_parallel_calls=AUTOTUNE)
+        ds = ds.batch(batch_size)
+        # ds = ds.repeat(repeat_count)
+        ds = ds.prefetch(buffer_size=AUTOTUNE)
+        
+        train_size = int(self.train_size * len(ds))
+        train_ds = ds.take(train_size)
+        valid_ds = ds.skip(train_size)
+        return train_ds, valid_ds
+    
+    def lr_dataset(self):
+        ds = tf.data.Dataset.from_tensor_slices(self._lr_image_files())
+        ds = ds.map(tf.io.read_file)
+        ds = ds.map(lambda x: tf.image.decode_png(x, channels=3), num_parallel_calls=AUTOTUNE)
+        ds = ds.map(lambda x: tf.image.convert_image_dtype(x, tf.float32))
+        return ds
+    
+    def hr_dataset(self):
+        ds = tf.data.Dataset.from_tensor_slices(self._hr_image_files())
+        ds = ds.map(tf.io.read_file)
+        ds = ds.map(lambda x: tf.image.decode_png(x, channels=3), num_parallel_calls=AUTOTUNE)
+        ds = ds.map(lambda x: tf.image.convert_image_dtype(x, tf.float32))
+        return ds
+    
+    def _lr_image_files(self):
+        return [os.path.join(self._lr_images_dir(), f) for f in os.listdir(self._lr_images_dir()) if f.endswith('.png')]
+    
+    def _hr_image_files(self):
+        return [os.path.join(self._hr_images_dir(), f) for f in os.listdir(self._hr_images_dir()) if f.endswith('.png')]
+    
+    def _lr_images_dir(self):
+        return os.path.join(self.images_dir, f'LR_{self.downgrade}_X{self.scale}')
+    
+    def _hr_images_dir(self):
+        return os.path.join(self.images_dir, f'HR')
+    
+    def produce_downgraded_images(self, hr_img, scale=2, downgrade='bicubic'):
+        return tf.image.resize(hr_img, [hr_img.shape[0] // scale, hr_img.shape[1] // scale], downgrade)
+
 # -----------------------------------------------------------
 #  Transformations
 # -----------------------------------------------------------
@@ -178,7 +247,6 @@ def random_flip(lr_img, hr_img):
 def random_rotate(lr_img, hr_img):
     rn = tf.random.uniform(shape=(), maxval=4, dtype=tf.int32)
     return tf.image.rot90(lr_img, rn), tf.image.rot90(hr_img, rn)
-
 
 # -----------------------------------------------------------
 #  IO
