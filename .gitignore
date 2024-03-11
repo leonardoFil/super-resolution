@@ -22,3 +22,4 @@ weights/srgan/gan_generator.h5
 weights/srgan/pre_generator.h5
 weights/wdsr-b-32-x4/weights.h5
 condaenv.eqsuqgtu.requirements.txt
+weights
