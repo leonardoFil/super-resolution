@@ -6,7 +6,7 @@ DIV2K_RGB_MEAN = np.array([0.4488, 0.4371, 0.4040]) * 255
 
 
 def resolve_single(model, lr):
-    return resolve(model, tf.expand_dims(lr, axis=0))[0]
+    return np.array(resolve(model, tf.expand_dims(lr, axis=0))[0])
 
 
 def resolve(model, lr_batch):

@@ -1,4 +1,25 @@
 .ipynb_checkpoints
 .div2k
 .ckpt
+.custom_data_test
 
+images
+__pycache__
+model/__pycache__
+copernicus_input_sheet.xlsx
+download.zip
+environment2.yml
+importCopern.py
+importData.py
+importSentinel.py
+test.jpg
+weights-wdsr-b-32-x4.tar.gz
+.vscode/launch.json
+weights/edsr-16-x4/weights_geosat.h5
+weights/edsr-16-x4/weights.h5
+weights/srgan/gan_discriminator.h5
+weights/srgan/gan_generator.h5
+weights/srgan/pre_generator.h5
+weights/wdsr-b-32-x4/weights.h5
+condaenv.eqsuqgtu.requirements.txt
+weights
